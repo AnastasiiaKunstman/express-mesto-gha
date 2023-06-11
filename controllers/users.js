@@ -1,9 +1,7 @@
 const User = require('../models/user');
-
-const ERROR_CODE_BAD_REQUEST = 400;
-const ERROR_CODE_NOT_FOUND = 404;
-const ERROR_CODE_INTERNAL = 500;
-const STATUS_CODES_CREATED = 201;
+const {
+  ERROR_CODE_BAD_REQUEST, ERROR_CODE_NOT_FOUND, ERROR_CODE_INTERNAL, STATUS_CODES_CREATED,
+} = require('../utils/errors');
 
 const getUsers = (req, res) => {
   User.find({})
@@ -18,8 +16,10 @@ const getUserById = (req, res) => {
     .catch((err) => {
       if (err.message === 'Not Found') {
         res.status(ERROR_CODE_NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден' });
-      } else {
+      } else if (err.name === 'CastError') {
         res.status(ERROR_CODE_BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
+      } else {
+        res.status(ERROR_CODE_INTERNAL).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
@@ -64,7 +64,7 @@ const updateAvatar = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_CODE_BAD_REQUEST).send({ message: 'Переданы некорректные данные при обновлении профиля.' });
-      } else if (err.message === 'NotFound') {
+      } else if (err.message === 'Not Found') {
         res.status(ERROR_CODE_NOT_FOUND).send({ message: 'Пользователь по указанному _id не найден' });
       } else {
         res.status(ERROR_CODE_INTERNAL).send({ message: 'На сервере произошла ошибка' });
