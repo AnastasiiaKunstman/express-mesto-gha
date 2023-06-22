@@ -18,15 +18,15 @@ const createUser = (req, res, next) => {
       avatar,
       email,
       password: hash,
-    })).then((user) => res.status(201).send({
+    }))
+    .then((user) => res.status(201).send({
       data: {
         name: user.name,
         about: user.about,
         avatar: user.avatar,
         email: user.email,
       },
-    })
-      .catch(next))
+    }))
     .catch((err) => {
       if (err.code === 11000) {
         next(new ConflictError('Пользователь с таким email уже существует'));
@@ -72,8 +72,9 @@ const getUserById = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new ValidationError('Переданы некорректные данные'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -86,8 +87,9 @@ const updateProfile = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ValidationError('Переданы некорректные данные.'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -100,8 +102,9 @@ const updateAvatar = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ValidationError('Переданы некорректные данные.'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
